@@ -1,0 +1,1 @@
+"""Income report generator package."""

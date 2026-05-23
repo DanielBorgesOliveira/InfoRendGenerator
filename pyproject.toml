@@ -1,0 +1,51 @@
+[build-system]
+requires = ["setuptools>=68", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "gerador-informe-rendimentos"
+version = "0.1.0"
+description = "Gera informe de rendimentos em PDF a partir de extrato OFX ou XLSX."
+readme = "README.md"
+requires-python = ">=3.11"
+authors = [
+    { name = "Van Dame" }
+]
+
+dependencies = [
+    "reportlab>=4.2.0",
+    "pandas>=2.2.0",
+    "openpyxl>=3.1.0",
+    "svglib>=1.5.1"
+]
+
+[project.optional-dependencies]
+dev = [
+    "black>=24.0.0",
+    "ruff>=0.5.0",
+    "pytest>=8.0.0"
+]
+
+[project.scripts]
+gerar-informe = "info_rend_generator.cli:main"
+
+[tool.setuptools.package-data]
+"info_rend_generator.assets" = ["*.svg"]
+
+[tool.setuptools.packages.find]
+where = ["src"]
+
+[tool.black]
+line-length = 100
+target-version = ["py311"]
+
+[tool.ruff]
+line-length = 100
+target-version = "py311"
+
+[tool.ruff.lint]
+select = [
+    "E",
+    "F",
+    "I"
+]
