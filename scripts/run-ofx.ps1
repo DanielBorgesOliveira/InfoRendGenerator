@@ -1,6 +1,6 @@
 python gerar_informe_rendimentos.py  `
-data\Extrato-01-01-2025-a-31-12-2026-OFX.ofx  `
-data\informe.pdf `
+--input-file data\Extrato-01-01-2025-a-31-12-2026-OFX.ofx  `
+--output-pdf data\informe.pdf `
 --exercicio 2026 `
 --ano-calendario 2025 `
 --fonte-cnpj "33.352.491/0001-99" `
@@ -14,5 +14,5 @@ data\informe.pdf `
 --rendimentos-positivos `
 --previdencia-keyword "RETENCAO INSS" `
 --irrf-keyword "IRRF A RECOLHER" `
---socio-microempresa-keyword "ANTECIPACAO DE DIVIDENDOS" `
+--exceto-prolabore-keyword "ANTECIPACAO DE DIVIDENDOS" `
 --audit-excel data\auditoria.xlsx

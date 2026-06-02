@@ -1,6 +1,5 @@
 python gerar_informe_rendimentos.py `
-    --input-file data\2025-Balanco.xlsx  `
-    --output-pdf data\2025-InformeRendimentos.pdf `
+    --output-pdf "E:/onedrive_hotmail/OneDrive/1-EMPRESAS/STME Engenharia/BalancoAnual/STME-InformeRendimentos2025.pdf" `
     --exercicio 2026 `
     --ano-calendario 2025 `
     --fonte-cnpj "33.352.491/0001-99" `
@@ -8,10 +7,9 @@ python gerar_informe_rendimentos.py `
     --beneficiario-cpf "971.453.760-67" `
     --beneficiario-nome "GUMERCINDO  DA SILVA SAURO" `
     --responsavel-nome "MICHAEL JACKSON SCHWARZENEGGER DA SILVA" `
-    --data "28/02/2026" `
+    --data "26/05/2026" `
     --natureza "RENDIMENTO DO TRABALHO ASSALARIADO NO PAIS" `
-    --rendimentos-keyword "PRO-LABORE" `
-    --irrf-keyword "IRRF A RECOLHER" `
-    --previdencia-keyword "RETENCAO INSS" `
-    --exceto-prolabore-keyword "ANTECIPACAO DE DIVIDENDOS" `
-    --audit-excel data\auditoria.xlsx
+    --valor-rendimentos "R$ 36.400,00" `
+    --valor-previdencia "R$ 4.004,00" `
+    --valor-irrf "R$ 1.137,24" `
+    --valor-exceto-prolabore "R$ 79.598,05"

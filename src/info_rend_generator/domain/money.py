@@ -16,5 +16,5 @@ def format_money(value: Decimal | float | str) -> str:
 def parse_money(value: Optional[str]) -> Optional[Decimal]:
     if value is None or value == "":
         return None
-    normalized = value.strip().replace(".", "").replace(",", ".")
+    normalized = value.strip().replace("R$", "").strip().replace(".", "").replace(",", ".")
     return quantize_money(normalized)

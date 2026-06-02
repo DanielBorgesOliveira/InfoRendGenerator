@@ -12,7 +12,7 @@ def calculate_informe(
     request: InformeRequest,
     transactions: list[Transaction] | None = None,
 ) -> tuple[InformeCalculation, list[Transaction]]:
-    transactions = transactions if transactions is not None else read_transactions(request.ofx)
+    transactions = _resolve_transactions(request, transactions)
     rendimentos_auto = sum_transactions(
         transactions,
         request.rendimentos_keyword,
@@ -42,15 +42,16 @@ def calculate_informe(
     socio_microempresa_auto = (
         sum_transactions(
             transactions,
-            request.socio_microempresa_keyword,
+            request.exceto_prolabore_keyword,
             positive=False,
             year=request.ano_calendario,
         )
-        if request.socio_microempresa_keyword
+        if request.exceto_prolabore_keyword
         else Decimal("0.00")
     )
 
     rendimentos_manual = parse_money(request.valor_rendimentos)
+    exceto_prolabore_manual = parse_money(request.valor_exceto_prolabore)
     previdencia_manual = parse_money(request.valor_previdencia)
     irrf_manual = parse_money(request.valor_irrf)
 
@@ -64,13 +65,17 @@ def calculate_informe(
         rendimentos=rendimentos_manual,
         previdencia=previdencia_manual,
         irrf=irrf_manual,
-        socio_microempresa=None,
+        socio_microempresa=exceto_prolabore_manual,
     )
     final_totals = InformeTotals(
         rendimentos=rendimentos_manual if rendimentos_manual is not None else rendimentos_auto,
         previdencia=previdencia_manual if previdencia_manual is not None else previdencia_auto,
         irrf=irrf_manual if irrf_manual is not None else irrf_auto,
-        socio_microempresa=socio_microempresa_auto,
+        socio_microempresa=(
+            exceto_prolabore_manual
+            if exceto_prolabore_manual is not None
+            else socio_microempresa_auto
+        ),
     )
 
     return (
@@ -81,6 +86,17 @@ def calculate_informe(
         ),
         transactions,
     )
+
+
+def _resolve_transactions(
+    request: InformeRequest,
+    transactions: list[Transaction] | None,
+) -> list[Transaction]:
+    if transactions is not None:
+        return transactions
+    if request.ofx is None:
+        return []
+    return read_transactions(request.ofx)
 
 
 def calculate_totals(request: InformeRequest) -> InformeTotals:

@@ -7,7 +7,7 @@ from pathlib import Path
 
 @dataclass(frozen=True)
 class InformeRequest:
-    ofx: str | Path
+    ofx: str | Path | None
     output_pdf: str | Path
     exercicio: str
     ano_calendario: int
@@ -22,8 +22,9 @@ class InformeRequest:
     rendimentos_positivos: bool
     previdencia_keyword: list[str]
     irrf_keyword: list[str]
-    socio_microempresa_keyword: list[str]
+    exceto_prolabore_keyword: list[str]
     valor_rendimentos: str | None = None
+    valor_exceto_prolabore: str | None = None
     valor_previdencia: str | None = None
     valor_irrf: str | None = None
     audit_excel: str | Path | None = None

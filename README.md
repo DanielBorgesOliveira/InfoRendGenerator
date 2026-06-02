@@ -30,14 +30,16 @@ src/info_rend_generator/
 ## Uso
 
 ```powershell
-python gerar_informe_rendimentos.py data\extrato.ofx data\informe.pdf --ano-calendario 2025
+python gerar_informe_rendimentos.py --input-file data\extrato.ofx --output-pdf data\informe.pdf --ano-calendario 2025
 ```
 
 Tambem e possivel usar uma planilha Excel com colunas `Data Lançamento`, `Descrição`,
 `Valor`, `TipoTransacao` e `ClassificacaoContabil`:
 
 ```powershell
-python gerar_informe_rendimentos.py data\Extrato-01-01-2025-a-31-12-2026.xlsx data\informe.pdf `
+python gerar_informe_rendimentos.py `
+  --input-file data\Extrato-01-01-2025-a-31-12-2026.xlsx `
+  --output-pdf data\informe.pdf `
   --ano-calendario 2025 `
   --rendimentos-keyword "PRO-LABORE"
 ```
@@ -53,7 +55,7 @@ na linha 6 de rendimentos isentos: valores pagos ao titular ou socio da microemp
 Depois de instalar o projeto:
 
 ```powershell
-gerar-informe data\extrato.ofx data\informe.pdf --ano-calendario 2025
+gerar-informe --input-file data\extrato.ofx --output-pdf data\informe.pdf --ano-calendario 2025
 ```
 
 ## Argumentos da CLI
@@ -61,14 +63,16 @@ gerar-informe data\extrato.ofx data\informe.pdf --ano-calendario 2025
 Formato geral:
 
 ```powershell
-python gerar_informe_rendimentos.py INPUT_FILE OUTPUT_PDF [opcoes]
+python gerar_informe_rendimentos.py --output-pdf OUTPUT_PDF [--input-file INPUT_FILE] [opcoes]
 ```
 
-### Argumentos obrigatorios
+### Arquivos
 
-`input_file`
+`--input-file`
 
-Caminho do arquivo OFX ou XLSX de entrada.
+Caminho opcional do arquivo OFX ou XLSX de entrada. Informe este argumento para
+calcular valores automaticamente a partir das transacoes. Omita este argumento
+quando for preencher todos os valores manualmente.
 
 Exemplo:
 
@@ -76,9 +80,9 @@ Exemplo:
 data\Extrato-01-01-2025-a-31-12-2026.xlsx
 ```
 
-`output_pdf`
+`--output-pdf`
 
-Caminho onde o PDF gerado sera salvo.
+Caminho obrigatorio onde o PDF gerado sera salvo.
 
 Exemplo:
 
@@ -236,22 +240,25 @@ Exemplo:
 --irrf-keyword "RECEITA FEDERAL"
 ```
 
-`--socio-microempresa-keyword`
+`--exceto-prolabore-keyword`
 
 Palavra-chave usada para encontrar valores isentos pagos ao titular ou socio da
-microempresa/EPP. Pode ser repetida.
+microempresa/EPP, exceto pro labore, alugueis ou servicos prestados. Pode ser
+repetida.
 
 Padrao: `ANTECIPACAO DE DIVIDENDOS`
 
 Exemplo:
 
 ```powershell
---socio-microempresa-keyword "ANTECIPACAO DE DIVIDENDOS"
+--exceto-prolabore-keyword "ANTECIPACAO DE DIVIDENDOS"
 ```
 
 ### Valores manuais
 
 Os valores manuais substituem o calculo automatico pelo OFX.
+Quando todos os valores forem informados manualmente, `--input-file` pode ser
+omitido.
 
 `--valor-rendimentos`
 
@@ -261,6 +268,17 @@ Exemplo:
 
 ```powershell
 --valor-rendimentos 71.900,00
+```
+
+`--valor-exceto-prolabore`
+
+Valor manual para a linha 6 de rendimentos isentos: valores pagos ao titular ou
+socio da microempresa/EPP, exceto pro labore, alugueis ou servicos prestados.
+
+Exemplo:
+
+```powershell
+--valor-exceto-prolabore 71.900,00
 ```
 
 `--valor-previdencia`
@@ -304,7 +322,9 @@ A planilha gerada tem tres abas:
 ## Exemplo completo
 
 ```powershell
-python gerar_informe_rendimentos.py data\Extrato-01-01-2025-a-31-12-2026-OFX.ofx data\informe.pdf `
+python gerar_informe_rendimentos.py `
+  --input-file data\Extrato-01-01-2025-a-31-12-2026-OFX.ofx `
+  --output-pdf data\informe.pdf `
   --exercicio 2026 `
   --ano-calendario 2025 `
   --fonte-cnpj "33.352.491/0001-99" `

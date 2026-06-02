@@ -203,6 +203,75 @@ class InformePDF:
             self.y = y
         self.y -= 6 * mm
 
+    def accumulated_income_table(self):
+        total_w = self.right - self.left
+        value_w = total_w * 0.19
+        label_w = total_w - value_w
+        top_w = total_w * 0.81
+        months_label_w = total_w * 0.16
+        months_value_w = total_w - top_w - months_label_w
+        top_h = 10 * mm
+        y = self.y - top_h
+
+        self.rect(self.left, y, top_w, top_h)
+        self.rect(self.left + top_w, y + top_h / 2, months_label_w, top_h / 2)
+        self.rect(
+            self.left + top_w + months_label_w,
+            y + top_h / 2,
+            months_value_w,
+            top_h / 2,
+        )
+
+        self.set_font(False, 7)
+        self.c.drawString(self.left + 2 * mm, y + top_h - 3.2 * mm, "6.1 Numero do processo:")
+        self.c.drawString(
+            self.left + top_w + 2 * mm,
+            y + top_h - 3.2 * mm,
+            "Quantidade de meses",
+        )
+        self.c.drawRightString(self.right - 1.5 * mm, y + top_h - 3.2 * mm, "0,0")
+        self.c.drawString(self.left + 2 * mm, y + 2.2 * mm, "Natureza do rendimento:")
+
+        self.y = y - 4 * mm
+        self.section_title("", "Valores em reais")
+
+        rows = [
+            (
+                "1. Total dos rendimentos tributaveis (inclusive ferias e decimo "
+                "terceiro salario)",
+                1,
+            ),
+            ("2. Exclusao: Despesas com a acao judicial", 1),
+            ("3. Deducao: Contribuicao previdenciaria oficial", 1),
+            ("4. Deducao: Pensao alimenticia (preencher tambem o quadro 7)", 1),
+            ("5. Imposto sobre a renda retido na fonte (IRRF)", 1),
+            (
+                "6. Rendimentos isentos de pensao, proventos de aposentadoria ou reforma "
+                "por molestia grave ou aposentadoria ou reforma por acidente em servico",
+                2,
+            ),
+        ]
+
+        for label, row_multiplier in rows:
+            h = self.row_h * row_multiplier
+            y = self.y - h
+            self.rect(self.left, y, label_w, h)
+            self.rect(self.left + label_w, y, value_w, h)
+            self.set_font(False, 7)
+            self.wrapped_text(
+                self.left + 2 * mm,
+                y + h - 3.6 * mm,
+                label,
+                label_w - 4 * mm,
+                h - 2 * mm,
+                7,
+                False,
+            )
+            self.c.drawRightString(self.right - 1.5 * mm, y + h - 3.6 * mm, "0,00")
+            self.y = y
+
+        self.y -= 6 * mm
+
     def blank_box(self, h_mm=6):
         h = h_mm * mm
         y = self.y - h
@@ -348,7 +417,7 @@ def render_informe_pdf(request: InformeRequest, totals: InformeTotals):
         "6. Rendimentos Recebidos Acumuladamente - Art. 12-A da Lei no 7.713, de 1988 "
         "(sujeitos a tributacao exclusiva)"
     )
-    pdf.blank_box(5)
+    pdf.accumulated_income_table()
     pdf.section_title("7. Informacoes Complementares")
     pdf.blank_box(5)
     pdf.footer(request.responsavel_nome, request.data)

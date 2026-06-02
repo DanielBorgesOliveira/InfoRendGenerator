@@ -229,3 +229,7 @@ __marimo__/
 
 # cProfile output.
 *.prof
+
+*.xls
+*.xlsx
+*.pdf

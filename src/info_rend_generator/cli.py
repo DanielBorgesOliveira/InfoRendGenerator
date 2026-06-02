@@ -6,9 +6,9 @@ from datetime import datetime
 from info_rend_generator.application.generate_informe import generate_informe
 from info_rend_generator.config.defaults import (
     DEFAULT_ANO_CALENDARIO,
+    DEFAULT_EXCETO_PROLABORE_KEYWORDS,
     DEFAULT_EXERCICIO,
     DEFAULT_NATUREZA,
-    DEFAULT_SOCIO_MICROEMPRESA_KEYWORDS,
 )
 from info_rend_generator.domain.informe import InformeRequest
 from info_rend_generator.domain.money import format_money
@@ -18,8 +18,18 @@ def build_parser() -> argparse.ArgumentParser:
     parser = argparse.ArgumentParser(
         description="Gera Informe de Rendimentos em PDF a partir de OFX ou XLSX."
     )
-    parser.add_argument("ofx", metavar="input_file", help="Arquivo OFX ou XLSX de entrada")
-    parser.add_argument("output_pdf", help="PDF de saida")
+    parser.add_argument(
+        "--input-file",
+        dest="ofx",
+        metavar="INPUT_FILE",
+        help="Arquivo OFX ou XLSX de entrada",
+    )
+    parser.add_argument(
+        "--output-pdf",
+        metavar="OUTPUT_PDF",
+        required=True,
+        help="PDF de saida",
+    )
     parser.add_argument("--exercicio", default=DEFAULT_EXERCICIO)
     parser.add_argument("--ano-calendario", type=int, default=DEFAULT_ANO_CALENDARIO)
     parser.add_argument("--fonte-cnpj", default="")
@@ -51,18 +61,40 @@ def build_parser() -> argparse.ArgumentParser:
         "--irrf-keyword", action="append", default=[], help="Filtra IRRF. Pode repetir."
     )
     parser.add_argument(
-        "--socio-microempresa-keyword",
+        "--exceto-prolabore-keyword",
         action="append",
         default=[],
         help=(
             "Filtra valores isentos pagos ao titular ou socio da microempresa/EPP. "
+            "Exceto pro labore, alugueis ou servicos prestados. "
             "Por padrao usa ANTECIPACAO DE DIVIDENDOS."
         ),
     )
 
-    parser.add_argument("--valor-rendimentos", help="Valor manual, ex.: 71.900,00")
-    parser.add_argument("--valor-previdencia", help="Valor manual, ex.: 7.909,00")
-    parser.add_argument("--valor-irrf", help="Valor manual, ex.: 6.753,26")
+    parser.add_argument(
+        "--valor-rendimentos",
+        nargs="+",
+        help="Valor manual, ex.: 71.900,00",
+    )
+    parser.add_argument(
+        "--valor-exceto-prolabore",
+        nargs="+",
+        help=(
+            "Valor manual para a linha 6 de rendimentos isentos: valores pagos ao "
+            "titular ou socio da microempresa/EPP, exceto pro labore, alugueis ou "
+            "servicos prestados. Ex.: 71.900,00"
+        ),
+    )
+    parser.add_argument(
+        "--valor-previdencia",
+        nargs="+",
+        help="Valor manual, ex.: 7.909,00",
+    )
+    parser.add_argument(
+        "--valor-irrf",
+        nargs="+",
+        help="Valor manual, ex.: 6.753,26",
+    )
     parser.add_argument(
         "--audit-excel",
         help=(
@@ -90,14 +122,21 @@ def request_from_args(args: argparse.Namespace) -> InformeRequest:
         rendimentos_positivos=args.rendimentos_positivos,
         previdencia_keyword=args.previdencia_keyword,
         irrf_keyword=args.irrf_keyword,
-        socio_microempresa_keyword=(
-            args.socio_microempresa_keyword or DEFAULT_SOCIO_MICROEMPRESA_KEYWORDS
+        exceto_prolabore_keyword=(
+            args.exceto_prolabore_keyword or DEFAULT_EXCETO_PROLABORE_KEYWORDS
         ),
-        valor_rendimentos=args.valor_rendimentos,
-        valor_previdencia=args.valor_previdencia,
-        valor_irrf=args.valor_irrf,
+        valor_rendimentos=_join_optional_tokens(args.valor_rendimentos),
+        valor_exceto_prolabore=_join_optional_tokens(args.valor_exceto_prolabore),
+        valor_previdencia=_join_optional_tokens(args.valor_previdencia),
+        valor_irrf=_join_optional_tokens(args.valor_irrf),
         audit_excel=args.audit_excel,
     )
+
+
+def _join_optional_tokens(tokens: list[str] | None) -> str | None:
+    if tokens is None:
+        return None
+    return " ".join(tokens)
 
 
 def main() -> None:

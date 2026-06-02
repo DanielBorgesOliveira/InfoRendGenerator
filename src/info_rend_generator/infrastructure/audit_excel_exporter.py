@@ -36,19 +36,18 @@ def export_audit_excel(
         _transactions_frame(pd, request, transactions).to_excel(
             writer, sheet_name="transactions", index=False
         )
-        pd.DataFrame(read_raw_data(request.ofx)).to_excel(
-            writer, sheet_name="raw_data", index=False
-        )
+        raw_data = read_raw_data(request.ofx) if request.ofx is not None else []
+        pd.DataFrame(raw_data).to_excel(writer, sheet_name="raw_data", index=False)
         _format_workbook(writer.book)
 
 
 def _summary_frame(pd, request: InformeRequest, calculation: InformeCalculation):
     rows = [
         {
-            "item": "ofx",
+            "item": "input_file",
             "automatic_value": "",
             "manual_value": "",
-            "final_value": str(request.ofx),
+            "final_value": str(request.ofx) if request.ofx is not None else "",
             "source": "input",
         },
         {
@@ -111,10 +110,10 @@ def _summary_frame(pd, request: InformeRequest, calculation: InformeCalculation)
             "source": "filter",
         },
         {
-            "item": "socio_microempresa_keyword",
+            "item": "exceto_prolabore_keyword",
             "automatic_value": "",
             "manual_value": "",
-            "final_value": ", ".join(request.socio_microempresa_keyword),
+            "final_value": ", ".join(request.exceto_prolabore_keyword),
             "source": "filter",
         },
     ]
@@ -153,8 +152,8 @@ def _transactions_frame(pd, request: InformeRequest, transactions: list[Transact
             _transaction_text(transaction), request.previdencia_keyword
         )
         irrf_keyword_matches = contains_all(_transaction_text(transaction), request.irrf_keyword)
-        socio_microempresa_keyword_matches = contains_all(
-            _transaction_text(transaction), request.socio_microempresa_keyword
+        exceto_prolabore_keyword_matches = contains_all(
+            _transaction_text(transaction), request.exceto_prolabore_keyword
         )
 
         included_rendimentos = (
@@ -169,11 +168,11 @@ def _transactions_frame(pd, request: InformeRequest, transactions: list[Transact
         included_irrf = (
             year_matches and negative_amount and bool(request.irrf_keyword) and irrf_keyword_matches
         )
-        included_socio_microempresa = (
+        included_exceto_prolabore = (
             year_matches
             and negative_amount
-            and bool(request.socio_microempresa_keyword)
-            and socio_microempresa_keyword_matches
+            and bool(request.exceto_prolabore_keyword)
+            and exceto_prolabore_keyword_matches
         )
         included_types = []
         if included_rendimentos:
@@ -182,8 +181,8 @@ def _transactions_frame(pd, request: InformeRequest, transactions: list[Transact
             included_types.append("previdencia")
         if included_irrf:
             included_types.append("irrf")
-        if included_socio_microempresa:
-            included_types.append("socio_microempresa")
+        if included_exceto_prolabore:
+            included_types.append("exceto_prolabore")
 
         rows.append(
             {
@@ -203,8 +202,8 @@ def _transactions_frame(pd, request: InformeRequest, transactions: list[Transact
                 "included_previdencia": included_previdencia,
                 "irrf_keyword_matches": irrf_keyword_matches,
                 "included_irrf": included_irrf,
-                "socio_microempresa_keyword_matches": socio_microempresa_keyword_matches,
-                "included_socio_microempresa": included_socio_microempresa,
+                "exceto_prolabore_keyword_matches": exceto_prolabore_keyword_matches,
+                "included_exceto_prolabore": included_exceto_prolabore,
                 "included_value_type": ", ".join(included_types),
                 "included_amount": (
                     _decimal_to_float(abs(transaction.amount)) if included_types else None
